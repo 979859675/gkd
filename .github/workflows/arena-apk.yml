@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -20,13 +21,24 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
+      - name: inspect android sdk
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_HOME" || true
+          ls "$ANDROID_HOME/platforms" || true
+          ls "$ANDROID_HOME/build-tools" || true
+          ls "$ANDROID_HOME/cmdline-tools" || true
 
       - name: install android sdk packages
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-37" "build-tools;37.0.0" "platform-tools" || true
-          sdkmanager --list_installed | head -40
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$SM" ] || SM=$(command -v sdkmanager)
+          echo "sdkmanager=$SM"
+          yes | "$SM" --licenses > /dev/null || true
+          "$SM" --install "platform-tools" "platforms;android-37" "build-tools;37.0.0" || true
+          ls "$SDK/platforms" "$SDK/build-tools"
 
       - uses: gradle/actions/setup-gradle@v4
 
@@ -45,3 +57,11 @@ jobs:
           name: gkd-apk
           path: gkd-android/build/outputs/apk/gkd/release/*.apk
           if-no-files-found: warn
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs
+          path: |
+            **/build/reports/**
+          if-no-files-found: ignore
