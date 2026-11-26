@@ -1,0 +1,10 @@
+name: arena-apk
+on:
+  workflow_dispatch:
+  push:
+    branches: ['arena/**']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hello && uname -a
