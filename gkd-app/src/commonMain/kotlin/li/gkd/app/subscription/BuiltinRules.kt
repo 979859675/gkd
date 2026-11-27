@@ -6,6 +6,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import li.gkd.app.logging.LogUtils
 import li.gkd.app.resources.Res
+import li.gkd.app.settings.FileSettingsStorage
+import li.gkd.app.storage.appStorage
 import li.gkd.db.Db
 import li.gkd.db.SubsItem
 import li.gkd.db.SubscriptionIds
@@ -24,23 +26,32 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 object BuiltinRules {
     private val libraryIdBase = 3_0000L
 
+    private val store by lazy { FileSettingsStorage(appStorage().privateStore) }
+
+    /** 已成功导入过的文件名，避免每次启动都重新解析数 MB 的规则。 */
+    private fun readImported(): MutableSet<String> =
+        store.read(IMPORTED_MARKER).orEmpty().lines().filter { it.isNotBlank() }.toMutableSet()
+
+    private fun writeImported(names: Set<String>) {
+        store.writeAtomically(IMPORTED_MARKER, names.sorted().joinToString("\n"))
+    }
+
     @OptIn(ExperimentalResourceApi::class)
-    private suspend fun readFiles() =
-        BUILTIN_RULE_FILES.mapNotNull { name ->
-            val text =
-                try {
-                    Res.readBytes("files/builtin_rules/$name").decodeToString()
-                } catch (e: Exception) {
-                    LogUtils.w("读取内置规则失败: $name", e)
-                    return@mapNotNull null
-                }
+    private suspend fun readFile(name: String): List<RawSubscription>? {
+        val text =
             try {
-                parseFile(name, text)
+                Res.readBytes("files/builtin_rules/$name").decodeToString()
             } catch (e: Exception) {
-                LogUtils.w("解析内置规则失败: $name", e)
-                null
+                LogUtils.w("读取内置规则失败: $name", e)
+                return null
             }
+        return try {
+            parseFile(name, text)
+        } catch (e: Exception) {
+            LogUtils.w("解析内置规则失败: $name", e)
+            null
         }
+    }
 
     private fun parseFile(name: String, text: String): List<RawSubscription> {
         val jsonObject =
@@ -78,28 +89,45 @@ object BuiltinRules {
         }
 
     suspend fun importMissing() {
+        val imported = readImported()
+        val pending = BUILTIN_RULE_FILES.filter { it !in imported }
+        if (pending.isEmpty()) return
         val existing = Db.subsItemDao.queryAll().mapTo(mutableSetOf()) { it.id }
         var order = existing.size
-        readFiles().flatten().forEach { subscription ->
-            if (subscription.id in existing || SubscriptionIds.isLocal(subscription.id)) {
-                return@forEach
+        pending.forEach { name ->
+            val subscriptions = readFile(name) ?: return@forEach
+            subscriptions.forEach { subscription ->
+                if (subscription.id in existing || SubscriptionIds.isLocal(subscription.id)) {
+                    return@forEach
+                }
+                existing += subscription.id
+                order += 1
+                try {
+                    SubscriptionRepository.saveWithItem(
+                        subscription = subscription,
+                        defaultItem = SubsItem(id = subscription.id, order = order, enable = true),
+                    )
+                } catch (e: Exception) {
+                    LogUtils.w("导入内置规则失败: ${subscription.id}", e)
+                }
             }
-            order += 1
-            try {
-                SubscriptionRepository.saveWithItem(
-                    subscription = subscription,
-                    defaultItem = SubsItem(id = subscription.id, order = order, enable = true),
-                )
-            } catch (e: Exception) {
-                LogUtils.w("导入内置规则失败: ${subscription.id}", e)
+            imported += name
+            if (runCatching { writeImported(imported) }.isFailure) {
+                LogUtils.w("记录内置规则导入状态失败: $name")
             }
         }
     }
 }
+
+/** 记录已导入的文件名，确保内置规则只在首次启动时解析一次。 */
+private const val IMPORTED_MARKER = "builtin_rules_imported.txt"
 
 // 资源打包顺序不受文件系统顺序控制，显式列出以免依赖目录遍历。
 private val BUILTIN_RULE_FILES =
     listOf(
         "1.json5",
         "2.json5",
+        "3-ganlin.json5",
+        "4-mengnian.json5",
+        "5-volcano.json5",
     )

@@ -58,8 +58,9 @@ jobs:
           echo "== apk: $APK ($(stat -c%s "$APK") bytes)"
           unzip -l "$APK" | grep -E "xposed|builtin_rules|lib/.*\.so" || true
           if unzip -l "$APK" | grep -q "META-INF/xposed"; then echo "unexpected lsposed module files"; exit 1; fi
-          unzip -l "$APK" | grep -q "builtin_rules/1.json5" || { echo "missing builtin rules 1"; exit 1; }
-          unzip -l "$APK" | grep -q "builtin_rules/2.json5" || { echo "missing builtin rules 2"; exit 1; }
+          for f in 1.json5 2.json5 3-ganlin.json5 4-mengnian.json5 5-volcano.json5; do
+            unzip -l "$APK" | grep -q "builtin_rules/$f" || { echo "missing builtin rule $f"; exit 1; }
+          done
           unzip -l "$APK" | grep -E "builtin_rules" 
           unzip -o -q "$APK" 'classes*.dex' -d /tmp/dex
           for f in /tmp/dex/classes*.dex; do strings -a "$f" | grep -E "li/gkd/app/priv/AutoStart|GkdXposedModule" | sort -u | head; done
@@ -84,7 +85,7 @@ jobs:
           - Root：检测到 su 后自动启动特权服务，并自动授予 WRITE_SECURE_SETTINGS
           - 无障碍：特权服务连上后自动开启首选无障碍服务
           - 常驻：自动打开常驻通知，保持前台服务，降低被系统回收的概率
-          - 内置规则：内置两个订阅（奥怪的GKD订阅、id667的GKD订阅），首次启动自动导入并默认启用
+          - 内置规则：内置 5 个订阅（奥怪的GKD订阅 / id667的GKD订阅 / 甘霖的GKD订阅 / 梦念逍遥のGKD订阅 / 火山虾的GKD订阅），首次启动自动导入并启用，只导入一次
           - 构建来源：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EOF
           )
