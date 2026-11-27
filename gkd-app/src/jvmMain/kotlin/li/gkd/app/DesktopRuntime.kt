@@ -28,6 +28,7 @@ import li.gkd.app.settings.updateSystemLanguage
 import li.gkd.app.storage.StorageMaintenance
 import li.gkd.app.storage.appStorage
 import li.gkd.app.subscription.RawSubscriptionParser
+import li.gkd.app.subscription.BuiltinRules
 import li.gkd.app.subscription.SubscriptionDefaults
 import li.gkd.app.subscription.SubscriptionRepository
 import li.gkd.app.ui.component.ToastState
@@ -173,6 +174,7 @@ class DesktopRuntime(
 
     val subscriptionInitialization = scope.launch {
         SubscriptionRepository.initialize(SubscriptionDefaults.fromResources())
+        BuiltinRules.importMissing()
         val imported = DesktopStorage.sessionDirectory.resolve("profile-imported")
         if (!imported.exists()) {
             val existing = Db.subsItemDao.queryAll().mapTo(mutableSetOf()) { it.id }

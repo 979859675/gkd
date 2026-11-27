@@ -164,6 +164,21 @@ private fun fixAutomationService() {
     }
 }
 
+/** 由模块、开机广播等外部入口请求一次自动启动，不弹出界面向导。 */
+fun startAutomatorFromHost(@CallSite loc: String = "") =
+    launchServiceControl(loc = loc) {
+        if (!settings.value.enableAutomator || currentAppBlocked) {
+            return@launchServiceControl
+        }
+        if (settings.value.useA11y) {
+            if (PermissionStates.writeSecureSettings.value) {
+                fixA11yService()
+            }
+        } else {
+            fixAutomationService()
+        }
+    }
+
 fun fixRestartAutomatorService(@CallSite loc: String = "") =
     launchServiceControl(loc = loc) {
         if (settings.value.enableAutomator && !currentAppBlocked) {

@@ -101,6 +101,8 @@ kotlin {
             api(libs.rikka.shizuku.api)
             api(libs.rikka.shizuku.provider)
             api(libs.lsposed.hiddenapibypass)
+            // LSPosed 模块入口，仅编译期依赖，运行时不打包框架 API。
+            compileOnly(libs.libxposed.api)
             api(libs.google.accompanist.drawablepainter)
             api(libs.androidx.splashscreen)
             api(libs.coil.gif)

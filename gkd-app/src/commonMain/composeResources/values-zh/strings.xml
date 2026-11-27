@@ -1226,4 +1226,5 @@
     <string name="snapshot_node_property_quick_find">可快速查找</string>
     <string name="snapshot_node_expand">展开</string>
     <string name="snapshot_node_collapse">收起</string>
+    <string name="a11y_restricted_settings_guide">无障碍未能自动开启：请在 LSPosed 中启用本应用（本安装包已内置模块），或用 Root/Shizuku 启动特权服务</string>
 </resources>

@@ -1233,4 +1233,5 @@
     <string name="snapshot_node_property_quick_find">Supports quick find</string>
     <string name="snapshot_node_expand">Expand</string>
     <string name="snapshot_node_collapse">Collapse</string>
+    <string name="a11y_restricted_settings_guide">Enable GKD under LSPosed (module included in this build) to avoid restricted settings, or start the privileged service with Root</string>
 </resources>

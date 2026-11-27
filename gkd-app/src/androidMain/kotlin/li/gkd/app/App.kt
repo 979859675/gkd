@@ -49,6 +49,7 @@ import li.gkd.app.notif.NotificationChannels
 import li.gkd.app.platform.lifecycle.MainActivityVisibility
 import li.gkd.app.platform.lifecycle.RuntimeStateSynchronizer
 import li.gkd.app.platform.overlay.KeepAliveOverlayCoordinator
+import li.gkd.app.priv.AutoStart
 import li.gkd.app.priv.PrivilegeOwnerLifecycle
 import li.gkd.app.priv.gkdPrivilegeUiConfig
 import li.gkd.app.priv.initPrivilege
@@ -56,6 +57,7 @@ import li.gkd.app.priv.requestPrivilegeRecovery
 import li.gkd.app.service.clearDebugSubscription
 import li.gkd.app.settings.syncSystemLanguage
 import li.gkd.app.snapshot.initVolumeSnapshotTrigger
+import li.gkd.app.subscription.BuiltinRules
 import li.gkd.app.subscription.SubscriptionDefaults
 import li.gkd.app.subscription.SubscriptionRepository
 import li.gkd.app.util.AndroidStorage
@@ -316,8 +318,10 @@ class App : Application() {
             PrivilegeUi.prepareExternalShellScript(gkdPrivilegeUiConfig.manualShellScriptPath)
         }
         requestPrivilegeRecovery()
+        AutoStart.requestOnce()
         appScope.launchLogged(Dispatchers.IO) {
             SubscriptionRepository.initialize(SubscriptionDefaults.fromResources())
+            BuiltinRules.importMissing()
             clearDebugSubscription()
         }
         RuntimeStateSynchronizer.requestSync()
