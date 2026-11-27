@@ -63,6 +63,8 @@ object BuiltinRules {
                 (app["id"] as? JsonPrimitive)?.content?.takeIf { it.isNotBlank() }
                     ?: return@mapNotNull null
             val appName = (app["name"] as? JsonPrimitive)?.content
+            val appWithGroups =
+                JsonObject(app + ("groups" to (app["groups"] ?: JsonArray(emptyList<JsonElement>()))))
             RawSubscription(
                 id = libraryIdBase + index,
                 name = "$name · ${appName ?: appId}",
@@ -70,9 +72,7 @@ object BuiltinRules {
                 author = "GKD 内置规则文件夹",
                 apps =
                     listOf(
-                        RawSubscriptionParser.parseApp(
-                            JsonObject(app + ("groups" to (app["groups"] ?: JsonArray(emptyList<JsonElement>()))),
-                        ),
+                        RawSubscriptionParser.parseApp(appWithGroups),
                     ),
             )
         }

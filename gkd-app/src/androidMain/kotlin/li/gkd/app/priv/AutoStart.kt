@@ -11,7 +11,7 @@ import li.gkd.app.appScope
 import li.gkd.app.logging.LogUtils
 import li.gkd.app.permission.AndroidPermissions
 import li.gkd.app.permission.PermissionStates
-import li.gkd.app.resources.Res
+import li.gkd.app.resources.*
 import li.gkd.app.service.A11yService
 import li.gkd.app.service.fixRestartAutomatorService
 import li.gkd.app.settings.SettingsRepository
