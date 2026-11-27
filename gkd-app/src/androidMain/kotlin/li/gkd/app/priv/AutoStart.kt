@@ -24,7 +24,7 @@ import priv.kit.core.Privilege
  *
  * - 特权服务：检测到 Root 才用 Root 启动，失败不影响其他能力；
  * - 无障碍：特权服务连上后由它授予 WRITE_SECURE_SETTINGS，再开启首选无障碍服务；
- * - 总开关：自动打开「自动化」和「规则匹配」。
+ * - 总开关：自动打开「自动化」和「规则匹配」「常驻通知」。
  */
 object AutoStart {
     private val A11Y_CHECK_DELAY = 5.seconds
@@ -62,9 +62,15 @@ object AutoStart {
 
     private fun enableAutomatorIfNeeded() {
         val settings = SettingsRepository.settings.value
-        if (settings.enableAutomator && settings.enableMatch) return
-        SettingsRepository.updateSettings { it.copy(enableAutomator = true, enableMatch = true) }
-        LogUtils.i("AutoStart: 已打开自动化与规则匹配总开关")
+        if (settings.enableAutomator && settings.enableMatch && settings.enableStatusService) return
+        SettingsRepository.updateSettings {
+            it.copy(
+                enableAutomator = true,
+                enableMatch = true,
+                enableStatusService = true,
+            )
+        }
+        LogUtils.i("AutoStart: 已打开自动化、规则匹配与常驻通知")
     }
 
     private suspend fun startRootPrivilege() {

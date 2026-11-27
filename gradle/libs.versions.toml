@@ -14,7 +14,6 @@ lifecycle = "2.11.0"
 nav3 = "1.2.0"
 paging = "3.5.3"
 priv-kit = "0.20.0"
-libxposed = "102.0.0"
 proguard = "7.10.0"
 remap = "0.1.7"
 room = "3.0.3"
@@ -86,7 +85,6 @@ kmp-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecyc
 permissions = "com.github.getActivity:XXPermissions:28.3"
 priv-kit-ui = { module = "io.github.priv-kit:priv-ui", version.ref = "priv-kit" }
 priv-kit-input = { module = "io.github.priv-kit:priv-input", version = "0.21.0" }
-libxposed-api = { module = "io.github.libxposed:api", version.ref = "libxposed" }
 remap-annotation = { module = "li.songe.remap:remap-annotation", version.ref = "remap" }
 remap-processor = { module = "li.songe.remap:remap-processor", version.ref = "remap" }
 reorderable = "sh.calvin.reorderable:reorderable:3.1.0"

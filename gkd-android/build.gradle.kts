@@ -85,8 +85,6 @@ android {
             "META-INF/**",
             "DebugProbesKt.bin",
         )
-    // LSPosed 模块描述文件不能被上面的 META-INF 通配排除，merges 优先于 excludes。
-    packaging.resources.merges += "META-INF/xposed/*"
 }
 
 val androidBuildAssetAdapter =
