@@ -57,3 +57,32 @@ jobs:
           name: gkd-apk
           path: gkd-android/build/outputs/apk/gkd/release/*.apk
           if-no-files-found: warn
+
+      - name: publish download release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=$(ls gkd-android/build/outputs/apk/gkd/release/*.apk | head -1)
+          BASE=$(basename "$APK" .apk)
+          TAG="apk-${BASE}"
+          NOTES=$(cat <<EOF
+          GKD 自定义构建（LSPosed 模块 + Root 特权启动 + 无障碍自动启动 + 内置规则文件夹）
+
+          - 包名 / 签名：li.songe.gkd，debug 签名（与官方版签名不同，安装前需卸载官方版）
+          - LSPosed：安装后在 LSPosed 中启用「GKD」，作用域勾选 GKD 自身即可
+          - Root：检测到 su 后自动启动特权服务
+          - 内置规则：订阅页可见「内置规则 · 示例开屏跳过」「内置规则 · 示例确认弹窗」，默认不启用
+          - 构建来源：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          )
+          for i in $(seq 1 20); do
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              gh release delete "$TAG" --yes --cleanup-tag
+            fi
+            if gh release create "$TAG" "$APK"               --title "$BASE"               --notes "$NOTES"               --latest=false; then
+              echo "released $BASE"
+              break
+            fi
+            sleep 3
+          done
+          gh release view "$TAG" --json url --jq .url
