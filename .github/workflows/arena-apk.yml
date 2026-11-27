@@ -41,14 +41,16 @@ jobs:
           ./gradlew :gkd-android:assembleGkdRelease --stacktrace 2>&1 | tee /tmp/build.log
           echo "status=ok" >> "$GITHUB_OUTPUT"
 
-      - name: publish build log on failure
+      - name: publish build errors as annotations
         if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          tail -c 60000 /tmp/build.log > /tmp/build-tail.log || true
-          jq -Rs '{title: ("[build-log] run " + env.GITHUB_RUN_ID), body: .}' /tmp/build-tail.log > /tmp/issue.json
-          gh api -X POST "repos/${GITHUB_REPOSITORY}/issues" --input /tmp/issue.json
+          # 把编译错误拆成 check-run annotation，便于通过 API 读取。
+          grep -nE "^e: |error:|What went wrong|Caused by:|^FAILURE" /tmp/build.log | tail -60 > /tmp/errors.txt || true
+          while IFS= read -r line; do
+            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' -e 's/%0A/%250A/g' -e 's/%0D/%250D/g')
+            echo "::error title=gradle::$msg"
+          done < /tmp/errors.txt
+          tail -c 4000 /tmp/build.log | tr '\n' ' ' | cut -c1-900 | sed 's/%/%25/g' | sed 's/^/::error title=tail::/'
 
       - uses: actions/upload-artifact@v4
         with:
