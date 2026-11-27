@@ -69,8 +69,8 @@ class SettingsCompatibilityTest {
     @Test
     fun missingFieldsKeepLegacyDefaultsAndInheritedGroups() {
         val defaults = Json.decodeFromString<SettingsStore>("{}")
-        assertTrue(defaults.useA11y)
-        assertFalse(defaults.useAutomation)
+        assertTrue(defaults.useAutomation)
+        assertFalse(defaults.useA11y)
         assertEquals(86_400_000L, defaults.updateSubsInterval)
         assertEquals(3, defaults.appSort)
         assertEquals(3, defaults.appGroupType)

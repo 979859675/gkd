@@ -11,10 +11,14 @@ import li.gkd.app.snapshot.SnapshotDisplayMode
 @Serializable
 data class SettingsStore(
     val enableAutomator: Boolean = false,
-    val automatorMode: Int = AutomatorMode.A11y.value,
+    val automatorMode: Int = AutomatorMode.Automation.value,
     val enableMatch: Boolean = true,
     val enableStatusService: Boolean = false,
     val enableStatusOverlay: Boolean = true,
+    // 纯 Root 构建默认不启用「伴生无障碍」，系统无障碍列表保持干净
+    val disableCompanionA11y: Boolean = true,
+    // 本构建是否已经把工作模式一次性切换为「自动化」
+    val rootOnlyModeApplied: Boolean = false,
     val excludeFromRecents: Boolean = false,
     val captureScreenshot: Boolean = false,
     val screenshotTargetAppId: String = "",

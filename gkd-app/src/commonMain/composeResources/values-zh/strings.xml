@@ -926,6 +926,8 @@
     <string name="keep_alive_strategy">保活策略</string>
     <string name="keep_alive_strategy_open">前往保活策略</string>
     <string name="keep_alive_app_measures">应用措施</string>
+    <string name="companion_a11y_keep_alive">伴生无障碍（抗后台清理）</string>
+    <string name="companion_a11y_keep_alive_description">自动化模式本身不需要无障碍，但系统对无障碍服务的清理优先级最低。开启后会在系统无障碍列表里出现一个 GKD 伴生服务，用于降低被后台杀掉的概率；部分应用会因此检测到无障碍</string>
     <string name="keep_alive_system_settings">系统设置</string>
     <string name="keep_alive_recents_lock">锁定最近任务</string>
     <string name="integration_tools_title">快捷操作</string>
@@ -1226,5 +1228,6 @@
     <string name="snapshot_node_property_quick_find">可快速查找</string>
     <string name="snapshot_node_expand">展开</string>
     <string name="snapshot_node_collapse">收起</string>
+    <string name="root_privilege_required_guide">未检测到特权服务：当前为纯 Root 自动化模式，请确认已授权 Root，否则无法点击跳过</string>
     <string name="a11y_restricted_settings_guide">无障碍未能自动开启：请用 Root 或 Shizuku 启动特权服务，GKD 会自动开启无障碍</string>
 </resources>

@@ -71,6 +71,7 @@ object CompanionServiceController {
                     SettingsRepository.companionScopeAppList.value,
                     appId,
                 ) -> "app_scope"
+                settings.disableCompanionA11y -> "companion_disabled"
                 else -> null
             }
         val shouldRun = stopReason == null

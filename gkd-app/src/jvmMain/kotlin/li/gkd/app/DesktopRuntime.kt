@@ -154,6 +154,7 @@ class DesktopRuntime(
         val enabled =
             settings.useAutomation &&
                 settings.enableAutomator &&
+                !settings.disableCompanionA11y &&
                 current.services.automationRunning &&
                 !AppScopePolicy.blocksCompanion(
                     settings,

@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import li.gkd.app.META
 import li.gkd.app.permission.AppPermission
+import li.gkd.app.platform.requestCompanionServiceUpdate
 import li.gkd.app.resources.*
 import li.gkd.app.settings.SettingsRepository
 import li.gkd.app.ui.MainViewModel
@@ -175,6 +176,17 @@ fun KeepAlivePage() {
                 title = stringResource(Res.string.status_overlay_keep_alive),
                 checked = store.enableStatusOverlay,
                 onCheckedChange = vm::requestStatusOverlayEnabled,
+            )
+            GkTextSwitch(
+                title = stringResource(Res.string.companion_a11y_keep_alive),
+                subtitle = stringResource(Res.string.companion_a11y_keep_alive_description),
+                checked = !store.disableCompanionA11y,
+                onCheckedChange = { enabled ->
+                    SettingsRepository.updateSettings {
+                        it.copy(disableCompanionA11y = !enabled)
+                    }
+                    requestCompanionServiceUpdate()
+                },
             )
             Text(
                 stringResource(Res.string.keep_alive_system_settings),

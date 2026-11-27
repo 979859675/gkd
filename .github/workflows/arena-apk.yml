@@ -79,11 +79,11 @@ jobs:
           BASE=$(basename "$APK" .apk)
           TAG="apk-${BASE}"
           NOTES=$(cat <<EOF
-          GKD 自定义构建（Root/Shizuku 特权启动 + 自动开无障碍 + 常驻通知 + 内置规则文件夹，不含 LSPosed 模块）
+          GKD 自定义构建（纯 Root 自动化 + 自动启特权服务 + 常驻通知 + 内置规则文件夹，不含 LSPosed 模块）
 
           - 包名 / 签名：li.songe.gkd，debug 签名（与官方版签名不同，安装前需卸载官方版）
           - Root：检测到 su 后自动启动特权服务，并自动授予 WRITE_SECURE_SETTINGS
-          - 无障碍：特权服务连上后自动开启首选无障碍服务
+          - 工作模式：默认「自动化」，由 Root 特权服务用 UiAutomation 读写界面，系统无障碍开关保持关闭；「伴生无障碍」默认关闭，可在保活策略页手动开启
           - 常驻：自动打开常驻通知，保持前台服务，降低被系统回收的概率
           - 内置规则：内置 5 个订阅（奥怪的GKD订阅 / id667的GKD订阅 / 甘霖的GKD订阅 / 梦念逍遥のGKD订阅 / 火山虾的GKD订阅），首次启动自动导入并启用，只导入一次
           - 构建来源：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
