@@ -88,7 +88,7 @@ object BuiltinRules {
             try {
                 SubscriptionRepository.saveWithItem(
                     subscription = subscription,
-                    defaultItem = SubsItem(id = subscription.id, order = order, enable = false),
+                    defaultItem = SubsItem(id = subscription.id, order = order, enable = true),
                 )
             } catch (e: Exception) {
                 LogUtils.w("导入内置规则失败: ${subscription.id}", e)
@@ -100,6 +100,6 @@ object BuiltinRules {
 // 资源打包顺序不受文件系统顺序控制，显式列出以免依赖目录遍历。
 private val BUILTIN_RULE_FILES =
     listOf(
-        "1-demo-splash.json5",
-        "2-demo-confirm.json5",
+        "1.json5",
+        "2.json5",
     )
