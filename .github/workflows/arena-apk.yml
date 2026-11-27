@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build:
@@ -21,47 +22,36 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: inspect android sdk
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          ls "$ANDROID_HOME" || true
-          ls "$ANDROID_HOME/platforms" || true
-          ls "$ANDROID_HOME/build-tools" || true
-          ls "$ANDROID_HOME/cmdline-tools" || true
-
       - name: install android sdk packages
         run: |
           SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
           SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
           [ -x "$SM" ] || SM=$(command -v sdkmanager)
-          echo "sdkmanager=$SM"
           yes | "$SM" --licenses > /dev/null || true
           "$SM" --install "platform-tools" "platforms;android-37" "build-tools;37.0.0" || true
-          ls "$SDK/platforms" "$SDK/build-tools"
 
       - uses: gradle/actions/setup-gradle@v4
 
       - name: build release apk
+        id: build
         env:
           GKD_RENAME_PACKAGE_FLAG: "1"
-        run: ./gradlew :gkd-android:assembleGkdRelease --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :gkd-android:assembleGkdRelease --stacktrace 2>&1 | tee /tmp/build.log
+          echo "status=ok" >> "$GITHUB_OUTPUT"
 
-      - name: list outputs
-        if: always()
-        run: find gkd-android/build/outputs -name "*.apk" -exec ls -l {} \;
+      - name: publish build log on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tail -c 60000 /tmp/build.log > /tmp/build-tail.log || true
+          jq -Rs '{title: ("[build-log] run " + env.GITHUB_RUN_ID), body: .}' /tmp/build-tail.log > /tmp/issue.json
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/issues" --input /tmp/issue.json
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: gkd-apk
           path: gkd-android/build/outputs/apk/gkd/release/*.apk
           if-no-files-found: warn
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build-logs
-          path: |
-            **/build/reports/**
-          if-no-files-found: ignore
