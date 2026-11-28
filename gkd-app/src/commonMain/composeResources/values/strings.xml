@@ -16,7 +16,6 @@
     <string name="global_rule_default_apps_enabled">On by default</string>
     <string name="global_rule_default_apps_disabled">Off by default</string>
     <string name="a11y_about">About accessibility</string>
-    <string name="a11y_automation_mode_notice">This app uses automation. Accessibility will be turned off automatically.</string>
     <string name="a11y_background_running_warning">Keep GKD running in the background after stopping the service. Otherwise, the system may suspend or terminate it and prevent the service from restarting.</string>
     <string name="a11y_enable">Enable accessibility</string>
     <string name="a11y_enable_guide_title">Enable GKD accessibility</string>

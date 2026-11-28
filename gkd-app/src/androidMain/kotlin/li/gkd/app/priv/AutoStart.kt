@@ -100,17 +100,15 @@ object AutoStart {
             !firstRun &&
                 settings.enableAutomator &&
                 settings.enableMatch &&
-                !settings.enableStatusService &&
-                !settings.enableStatusOverlay
+                settings.enableStatusService
         )
             return
         SettingsRepository.updateSettings {
             it.copy(
                 enableAutomator = true,
                 enableMatch = true,
-                // 纯 Root 保活：默认不用常驻通知 / 悬浮窗
-                enableStatusService = false,
-                enableStatusOverlay = false,
+                // 保活以常驻通知为主（自动化模式仍不开系统无障碍）
+                enableStatusService = true,
                 // 只在本构建第一次启动时切到自动化，之后保留用户在「工作模式」里的选择
                 automatorMode =
                     if (firstRun) AutomatorMode.Automation.value else it.automatorMode,
@@ -120,7 +118,7 @@ object AutoStart {
         LogUtils.i("AutoStart: 已打开自动化与规则匹配" + if (firstRun) "（工作模式=自动化）" else "")
     }
 
-    /** 按设置决定是否维持 root 看门狗，并把过期的前台通知/悬浮窗关掉。 */
+    /** 按设置决定保活方式：常驻通知为主，root 看门狗作为可选补充。 */
     private suspend fun applyKeepAlive() {
         val settings = SettingsRepository.settings.value
         if (settings.enableRootKeepAlive) {
@@ -133,8 +131,10 @@ object AutoStart {
         } else {
             RootKeepAlive.stop()
         }
-        // 关掉可能残留的前台常驻通知
-        if (!settings.enableStatusService) {
+        // 保活以常驻通知为主：开着就确保前台服务在跑，关着就停掉
+        if (settings.enableStatusService) {
+            StatusService.autoStart()
+        } else {
             StatusService.stop()
         }
     }

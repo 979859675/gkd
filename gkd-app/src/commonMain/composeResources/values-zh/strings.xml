@@ -16,7 +16,6 @@
     <string name="global_rule_default_apps_enabled">默认开启</string>
     <string name="global_rule_default_apps_disabled">默认关闭</string>
     <string name="a11y_about">关于无障碍</string>
-    <string name="a11y_automation_mode_notice">当前应用使用自动化，无障碍将自动关闭</string>
     <string name="a11y_background_running_warning">必须确保服务关闭后的持续后台运行，否则会被系统暂停或结束运行导致重启失败</string>
     <string name="a11y_enable">开启无障碍</string>
     <string name="a11y_enable_guide_title">开启 GKD 无障碍</string>

@@ -162,6 +162,10 @@ abstract class A11yService : AccessibilityService(), AndroidAutomationSession {
             if (!replacementRequested) {
                 if (tempShutdownFlag) {
                     ToastUtils.show(Res.string.a11y_partially_disabled.getSync())
+                } else if (SettingsRepository.settings.value.useAutomation) {
+                    // 自动化模式下无障碍本来就不该运行，关闭时不再提示
+                    LogUtils.i("无障碍已关闭（自动化模式，静默）")
+                    if (ownsState) updateEnableAutomator(false)
                 } else {
                     ToastUtils.show(Res.string.a11y_stopped.getSync())
                     if (ownsState) updateEnableAutomator(false)
@@ -216,7 +220,8 @@ abstract class A11yService : AccessibilityService(), AndroidAutomationSession {
         val useA11y = SettingsRepository.settings.value.useA11y
         if (!useA11y || this::class.componentName != preferredComponent) {
             if (!useA11y) {
-                ToastUtils.show(Res.string.a11y_automation_mode_notice.getSync(), forced = true)
+                // 自动化模式下系统仍可能把残留的无障碍连接上来：静默关闭，不再提示
+                LogUtils.i("无障碍在自动化模式下被连接，已静默关闭")
             }
             shutdownForReplacement()
             scope.cancel()
