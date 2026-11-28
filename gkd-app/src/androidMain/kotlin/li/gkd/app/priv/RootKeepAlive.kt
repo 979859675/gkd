@@ -173,6 +173,12 @@ object RootKeepAlive {
             su(command).orEmpty()
         }
 
+    /** 是否有可用的 su（KernelSU / APatch / Magisk 均可）。 */
+    suspend fun hasSu(): Boolean =
+        withContext(Dispatchers.IO) {
+            su("id")?.contains("uid=0") == true
+        }
+
     private fun su(command: String): String? =
         try {
             val process = ProcessBuilder("su", "-c", command).redirectErrorStream(true).start()

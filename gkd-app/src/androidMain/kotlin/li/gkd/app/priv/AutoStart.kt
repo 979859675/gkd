@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import li.gkd.app.app
+import li.gkd.app.app.AppInfoRepository
 import li.gkd.app.appScope
 import li.gkd.app.logging.LogUtils
 import li.gkd.app.permission.AndroidPermissions
@@ -118,11 +119,26 @@ object AutoStart {
         LogUtils.i("AutoStart: 已打开自动化与规则匹配" + if (firstRun) "（工作模式=自动化）" else "")
     }
 
+    /**
+     * 冷启动自愈：应用列表没提交下来时，规则快照会一直停在 Loading，
+     * 界面显示「配置加载中」且规则不生效。这里是最后一道兜底。
+     */
+    private suspend fun ensureAppCatalog() {
+        repeat(3) { attempt ->
+            if (AppInfoRepository.snapshot != null) return
+            LogUtils.i("AutoStart: 应用列表仍为空，主动刷新 attempt=${attempt + 1}")
+            runCatching { AppInfoRepository.refresh("@gkd/priv/AutoStart#ensureAppCatalog") }
+                .onFailure { LogUtils.w("AutoStart: 刷新应用列表失败", it) }
+            if (AppInfoRepository.snapshot != null) return
+            delay(3.seconds)
+        }
+    }
+
     /** 按设置决定保活方式：常驻通知为主，root 看门狗作为可选补充。 */
     private suspend fun applyKeepAlive() {
         val settings = SettingsRepository.settings.value
         if (settings.enableRootKeepAlive) {
-            if (isRootAvailable()) {
+            if (RootKeepAlive.hasSu()) {
                 val started = RootKeepAlive.start()
                 if (!started) {
                     LogUtils.w("AutoStart: root 看门狗启动失败")
