@@ -11,3 +11,6 @@ actual fun requestCompanionServiceUpdate(): PlatformResult<Unit> {
     DesktopRuntime.requireCurrent().updateCompanionService()
     return PlatformResult.Success(Unit)
 }
+
+/** Desktop 没有 root 看门狗，开关只影响设置，不模拟系统级行为。 */
+actual fun requestRootKeepAliveUpdate() = Unit

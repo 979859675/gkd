@@ -168,6 +168,12 @@ fun KeepAlivePage() {
                 color = MaterialTheme.colorScheme.primary,
             )
             GkTextSwitch(
+                title = stringResource(Res.string.root_keep_alive),
+                subtitle = stringResource(Res.string.root_keep_alive_description),
+                checked = store.enableRootKeepAlive,
+                onCheckedChange = vm::requestRootKeepAlive,
+            )
+            GkTextSwitch(
                 title = stringResource(Res.string.persistent_notification),
                 checked = platform.statusRunning && store.enableStatusService,
                 onCheckedChange = host::setStatusServiceEnabled,

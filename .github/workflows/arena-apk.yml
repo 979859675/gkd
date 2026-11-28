@@ -63,7 +63,10 @@ jobs:
           done
           unzip -l "$APK" | grep -E "builtin_rules" 
           unzip -o -q "$APK" 'classes*.dex' -d /tmp/dex
-          for f in /tmp/dex/classes*.dex; do strings -a "$f" | grep -E "li/gkd/app/priv/AutoStart|GkdXposedModule" | sort -u | head; done
+          for f in /tmp/dex/classes*.dex; do strings -a "$f" | grep -E "li/gkd/app/priv/AutoStart|RootKeepAlive|RootWakeService|GkdXposedModule" | sort -u | head; done
+          strings -a /tmp/dex/classes*.dex > /tmp/dexstrings.txt
+          grep -q "RootWakeService" /tmp/dexstrings.txt || { echo "missing RootWakeService"; exit 1; }
+          grep -q "gkd-watchdog.sh" /tmp/dexstrings.txt || { echo "missing watchdog script"; exit 1; }
 
       - uses: actions/upload-artifact@v4
         with:
@@ -79,12 +82,13 @@ jobs:
           BASE=$(basename "$APK" .apk)
           TAG="apk-${BASE}"
           NOTES=$(cat <<EOF
-          GKD 自定义构建（纯 Root 自动化 + 自动启特权服务 + 常驻通知 + 内置规则文件夹，不含 LSPosed 模块）
+          GKD 自定义构建（纯 Root 自动化 + root 看门狗保活，无常驻通知/悬浮窗 + 内置规则文件夹，不含 LSPosed 模块）
 
           - 包名 / 签名：li.songe.gkd，debug 签名（与官方版签名不同，安装前需卸载官方版）
           - Root：检测到 su 后自动启动特权服务，并自动授予 WRITE_SECURE_SETTINGS
           - 工作模式：默认「自动化」，由 Root 特权服务用 UiAutomation 读写界面，系统无障碍开关保持关闭；「伴生无障碍」默认关闭，可在保活策略页手动开启
-          - 常驻：自动打开常驻通知，保持前台服务，降低被系统回收的概率
+          - 保活：用 root 跑独立看门狗（/data/adb 或 /data/local/tmp），进程被杀后 30 秒内自动拉起；同时把 oom 权重压到 -1000、加入 doze 白名单、待机分桶设为 active。默认不启用常驻通知和悬浮窗
+          - 已知限制：被杀到重新拉起之间最多有 30 秒空窗期
           - 内置规则：内置 5 个订阅（奥怪的GKD订阅 / id667的GKD订阅 / 甘霖的GKD订阅 / 梦念逍遥のGKD订阅 / 火山虾的GKD订阅），首次启动自动导入并启用，只导入一次
           - 构建来源：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EOF

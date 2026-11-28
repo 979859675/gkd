@@ -932,6 +932,11 @@
     <string name="keep_alive_strategy">Keep-alive settings</string>
     <string name="keep_alive_strategy_open">Open keep-alive settings</string>
     <string name="keep_alive_app_measures">App measures</string>
+    <string name="root_keep_alive">Root watchdog (no notification / no overlay)</string>
+    <string name="root_keep_alive_description">Runs a standalone watchdog with root that restarts GKD within 30 seconds after it is killed. No persistent notification and no overlay; it also lowers the oom weight and whitelists the app from battery restrictions. Requires su from KernelSU / APatch / Magisk</string>
+    <string name="root_keep_alive_enable_toast">Root watchdog started</string>
+    <string name="root_keep_alive_disable_toast">Root watchdog stopped</string>
+    <string name="root_keep_alive_failed_toast">Root watchdog failed to start; make sure su is granted</string>
     <string name="companion_a11y_keep_alive">Companion accessibility (anti-kill)</string>
     <string name="companion_a11y_keep_alive_description">Automation mode does not need accessibility, but accessibility services are the last to be killed. Enabling this adds a GKD companion service to the system accessibility list to reduce background kills; some apps may then detect accessibility</string>
     <string name="keep_alive_system_settings">System settings</string>

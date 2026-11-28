@@ -14,7 +14,9 @@ data class SettingsStore(
     val automatorMode: Int = AutomatorMode.Automation.value,
     val enableMatch: Boolean = true,
     val enableStatusService: Boolean = false,
-    val enableStatusOverlay: Boolean = true,
+    val enableStatusOverlay: Boolean = false,
+    // 纯 Root 保活：root 看门狗负责把 App 拉回来，不占用常驻通知与悬浮窗
+    val enableRootKeepAlive: Boolean = true,
     // 纯 Root 构建默认不启用「伴生无障碍」，系统无障碍列表保持干净
     val disableCompanionA11y: Boolean = true,
     // 本构建是否已经把工作模式一次性切换为「自动化」

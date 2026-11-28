@@ -926,6 +926,11 @@
     <string name="keep_alive_strategy">保活策略</string>
     <string name="keep_alive_strategy_open">前往保活策略</string>
     <string name="keep_alive_app_measures">应用措施</string>
+    <string name="root_keep_alive">Root 看门狗（无通知 / 无悬浮窗）</string>
+    <string name="root_keep_alive_description">用 root 在系统里跑一个独立看门狗，进程被杀后 30 秒内自动拉起。不占用常驻通知，也不显示悬浮窗；同时把 oom 权重压到最低、加入省电白名单。需要 KernelSU / APatch / Magisk 的 su</string>
+    <string name="root_keep_alive_enable_toast">Root 看门狗已启动</string>
+    <string name="root_keep_alive_disable_toast">Root 看门狗已停止</string>
+    <string name="root_keep_alive_failed_toast">Root 看门狗启动失败，请确认已授权 su</string>
     <string name="companion_a11y_keep_alive">伴生无障碍（抗后台清理）</string>
     <string name="companion_a11y_keep_alive_description">自动化模式本身不需要无障碍，但系统对无障碍服务的清理优先级最低。开启后会在系统无障碍列表里出现一个 GKD 伴生服务，用于降低被后台杀掉的概率；部分应用会因此检测到无障碍</string>
     <string name="keep_alive_system_settings">系统设置</string>
