@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import li.gkd.app.app
 import li.gkd.app.app.AppCatalogQuery
@@ -107,7 +106,7 @@ object PackageAppCatalog {
         appScope.launch(Dispatchers.IO) {
             // 不能 drop(1)：进程重启后特权服务往往已经连上，首个值就是“已连接”，
             // 丢掉它会导致后续不再触发刷新，应用列表可能一直提交不了。
-            privilegeContextFlow.distinctUntilChanged().collect {
+            privilegeContextFlow.collect {
                 AppInfoRepository.privilegeChanged(
                     source = "privilegeContextFlow(connected=${it != null})",
                 )
